@@ -16,4 +16,4 @@ app.use("/api/auth", authRouter)
 app.use("/", (req, res) => {
     res.json({ success: true, message: "Server is healthy" })
 })
-app.listen(4000, () => console.log(`Server is running on http://localhost:${PORT}`))
+app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`))
