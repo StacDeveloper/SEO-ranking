@@ -40,7 +40,7 @@ export async function login(req, res) {
             return res.json({ success: false, message: "All fields are required" })
         }
         const user = await User.findOne({ email })
-        if (!existingUser) {
+        if (!user) {
             return res.status(401).json({ success: false, message: "User not found" })
         }
 

@@ -44,7 +44,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
 
     async function login(email: string, password: string) {
         try {
-            const response = await axios.post("/api/auth/login", { email, password })
+            const response = await axios.post(`${BACKEND_URL}/api/auth/login`, { email, password })
             if (response.data.success) {
                 SetToken(response.data.token)
                 SetUser(response.data.user)
@@ -60,7 +60,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
     }
     async function register(name: string, email: string, password: string) {
         try {
-            const { data } = await api.post("/api/auth/register", { name, email, password })
+            const { data } = await api.post(`${BACKEND_URL}/api/auth/register`, { name, email, password })
             if (data.success) {
                 SetUser(data.user)
                 SetToken(data.token)
