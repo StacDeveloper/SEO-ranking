@@ -64,9 +64,37 @@ export const rankTracker = async (keyword, targetdomain) => {
                 }).filter(Boolean))
                 if (pageResults.length > 0) break
                 await page.reload({ waitUntil: "networkidle" })
+                if (!page.length) break
+                for (const res of pageResults) {
+                    res.position = allResults.length + 1
+                    allResults.push(res)
+                    if (!found && (res.domain.toLowerCase().includes(cleanTarget) || cleanTarget.includes(res.domain.toLowerCase()))) {
+                        found = { ...res, page: googlePage + 1 }
+                    }
+                }
+                if (found) break
+                await page.waitForTimeout(2000 + Math.random() * 2000)
+            }
+            // Finalization : Close browser and extract competitors
+            await browser.close()
+            const competitors = allResults.filter((comp) => !comp.domain.toLocaleLowerCase().includes(cleanTarget) && !cleanTarget.includes(comp.domain.toLowerCase().slice(0, 10)))
+            return {
+                success: true,
+                data: {
+                    keyword,
+                    domain,
+                    position: found?.position || null,
+                    page: found?.page || null,
+                    title: found?.title || null,
+                    snippet: found?.snippet || "",
+                    competitors,
+                    totalresultsScanned: allResults.length
+                }
             }
         }
     } catch (error) {
         console.log(error)
+        if (browser) await browser.close().catch((err) > { success: false, message: err.message })
+        return { success: false, message: error.message || "Failed to resolve rank tracker" }
     }
 }
