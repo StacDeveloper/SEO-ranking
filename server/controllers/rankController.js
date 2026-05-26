@@ -68,8 +68,23 @@ export async function refreshKeyWord(req, res) {
     }
 }
 export async function deleteKeyWord(req, res) {
+    try {
+        const tracking = await keyWord.findOneAndDelete({ _id: req.params.id, userId: req.userId })
+        if (!tracking) return res.status(400).json({ success: false, message: "No tracking found to delete" })
+        res.status(200).json({ success: true, message: `Keyword tracking deleted ${tracking.id || ""}` })
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message || "Failed to delete tracking" })
+    }
 
 }
 export async function toggleKeyWord(req, res) {
-
+    try {
+        const tracking = await keyWord.findOne({ _id: req.params.id, userId: req.userId })
+        if (!tracking) return res.status(400).json({ success: false, message: `Tracking doesn't exist ${req.params.id}` || "No tracking found" })
+        tracking.active = !tracking.active;
+        await tracking.save()
+        res.status(200).json({ success: true, tracking })
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message || "toggle tracking error" })
+    }
 }

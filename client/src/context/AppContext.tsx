@@ -45,6 +45,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
     async function login(email: string, password: string) {
         try {
             const response = await axios.post(`${BACKEND_URL}/api/auth/login`, { email, password })
+            console.log(response)
             if (response.data.success) {
                 SetToken(response.data.token)
                 SetUser(response.data.user)
@@ -77,6 +78,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
         SetUser(null)
         localStorage.removeItem("token")
     }
+
     async function loadUser() {
         if (!token) {
             SetLoading(false)

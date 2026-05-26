@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Target, Plus, RefreshCw, Trash2, TrendingUp, TrendingDown, Minus, ExternalLink, Clock, Loader2, X, Search, Globe, AlertCircle, Eye, EyeOff, Filter, ArrowUpDown } from "lucide-react";
 import { dummyRankings } from "../assets/assets";
+import { useAppContext } from "../context/AppContext";
+import toast from "react-hot-toast";
 
 interface KeywordItem {
     _id: string;
@@ -20,6 +22,7 @@ interface KeywordItem {
 }
 
 export default function RankTracker() {
+    const { api } = useAppContext()
     const [keywords, setKeywords] = useState<KeywordItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [showAddModal, setShowAddModal] = useState(false);
@@ -34,10 +37,18 @@ export default function RankTracker() {
     const [sortBy, setSortBy] = useState("newest");
 
     const fetchKeywords = async () => {
-        setTimeout(() => {
-            setKeywords(dummyRankings);
-            setLoading(false);
-        }, 1000);
+        setLoading(false)
+        try {
+            const data = await api.get("/api/rank/list")
+            if(data.data.success){
+                console.log(data)
+                setKeywords(data.data.keywords)
+            }
+        } catch (error) {
+            console.log(error)
+            toast.error("Failed to get keyword")
+        }
+        setLoading(true)
     };
 
     const handleAdd = async (e: React.SubmitEvent) => {

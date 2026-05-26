@@ -18,20 +18,27 @@ export default function Login({ state }: { state: string }) {
     const handleSubmit = async (e: React.SubmitEvent) => {
         e.preventDefault();
         SetLoading(true)
-        let result;
-        if (isLoginState) {
-            result = await login(email, password)
-        } else {
-            result = await register(name, email, password)
+        try {
+            let result;
+            if (isLoginState) {
+                result = await login(email, password)
+            } else {
+                result = await register(name, email, password)
+            }
+            if (result.success) {
+                const redirect = searchParams.get("redirect") || "/dashboard"
+                SetLoading(false)
+                navigate(redirect)
+            }
+            else {
+                toast.error(result.message || "Login failed")
+            }
+        } catch (error) {
+            console.log(error)
+        } finally {
+            SetLoading(false)
         }
-        if (result.success) {
-            const redirect = searchParams.get("redirect") || "/dashboard"
-            navigate(redirect)
-        }
-        else {
-            toast.error(result.message || "Login failed")
-        }
-        SetLoading(false)
+
     };
 
     return (
