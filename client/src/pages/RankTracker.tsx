@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Target, Plus, RefreshCw, Trash2, TrendingUp, TrendingDown, Minus, ExternalLink, Clock, Loader2, X, Search, Globe, AlertCircle, Eye, EyeOff, Filter, ArrowUpDown } from "lucide-react";
-import { dummyRankings } from "../assets/assets";
 import { useAppContext } from "../context/AppContext";
 import toast from "react-hot-toast";
 
@@ -37,27 +36,56 @@ export default function RankTracker() {
     const [sortBy, setSortBy] = useState("newest");
 
     const fetchKeywords = async () => {
-        setLoading(false)
+        setLoading(true)
         try {
             const data = await api.get("/api/rank/list")
-            if(data.data.success){
-                console.log(data)
+            if (data.data.success) {
                 setKeywords(data.data.keywords)
             }
         } catch (error) {
             console.log(error)
             toast.error("Failed to get keyword")
         }
-        setLoading(true)
+        finally {
+            setLoading(false)
+        }
     };
 
     const handleAdd = async (e: React.SubmitEvent) => {
         e.preventDefault();
-        setAdding(true);
-        setTimeout(() => {
-            setShowAddModal(false);
-            setAdding(false);
-        }, 1000);
+        if (!newKeyword.trim() || !newUrl.trim()) return
+        setAdding(true)
+        setAddError("")
+        try {
+            const res = await api.post("/api/rank/add", {
+                keyword: newKeyword.trim(),
+                url: newUrl.trim()
+            })
+            if (res.data.success) {
+                setKeywords((prev) => [res.data.tracking, ...prev])
+                setNewKeyword("")
+                setNewUrl("")
+                setShowAddModal(false)
+                const id = res.data.tracking._id
+                const pollInterval = setInterval(async () => {
+                    try {
+                        const check = await api.get(`/api/rank/${id}`)
+                        if (check.data.tracking.status !== "checking") {
+                            clearInterval(pollInterval)
+                            setKeywords((prev) => prev.map((key) => key._id === id ? check.data.tracking : key))
+                        }
+                    } catch (error: any) {
+                        console.log(error)
+                    }
+                }, 3000);
+            }
+        } catch (error: any) {
+            console.log(error)
+            setAddError(error?.response?.data?.message || "Failed to add keyword")
+        }
+        finally {
+            setAdding(false)
+        }
     };
 
     const handleRefresh = async (id: string) => {

@@ -18,7 +18,7 @@ export async function addKeyword(req, res) {
             return res.status(400).json({ success: false, message: "Already tracking this keyword for this domain" })
         }
         // create tracking entry
-        const trackng = await keyWord.create({
+        const tracking = await keyWord.create({
             userId: req.userId,
             keyword: keyword.toLowerCase().trim(),
             url: url.startsWith("http") ? url : `https://${url}`,

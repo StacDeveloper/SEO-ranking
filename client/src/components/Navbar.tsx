@@ -10,10 +10,11 @@ export default function Navbar() {
     const navigate = useNavigate();
     const location = useLocation();
     const [mobileOpen, setMobileOpen] = useState(false);
-
+    
     const handleLogout = () => {
        logout()
     };
+
 
     const isActive = (path: string) => location.pathname === path;
 

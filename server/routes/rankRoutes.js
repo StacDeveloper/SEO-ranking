@@ -7,7 +7,7 @@ const rankRoutes = express.Router()
 
 rankRoutes.post("/add", auth, addKeyword)
 rankRoutes.get("/list", auth, getAllKeyWords)
-rankRoutes.get("/list/:id", auth, getSingleKeyWord)
+rankRoutes.get("/:id", auth, getSingleKeyWord)
 rankRoutes.get("/:id/refresh", auth, refreshKeyWord)
 rankRoutes.get("/:id/toggle", auth, toggleKeyWord)
 rankRoutes.delete("/:id/delete", auth, deleteKeyWord)

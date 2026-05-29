@@ -27,7 +27,7 @@ export const rankTracker = async (keyword, targetdomain) => {
         const cleanTarget = targetdomain.replace("www.", "").toLowerCase()
         // check upto 5 results
         for (let googlePage = 0; googlePage < 5; googlePage++) {
-            await page.goto(`https://www.google.com/search?q=${encodeURIComponent(keyword)}&start=${googlePage * 10}&num=10%hl=en&gl=us`, { waitUntil: "networkidle" })
+            await page.goto(`https://www.google.com/search?q=${encodeURIComponent(keyword)}&start=${googlePage * 10}&num=10&-hl=en&gl=us`, { waitUntil: "networkidle" })
 
             // Page extraction: retry upto 3 results
             let pageResults = []
@@ -82,7 +82,7 @@ export const rankTracker = async (keyword, targetdomain) => {
                 success: true,
                 data: {
                     keyword,
-                    domain,
+                    domain:targetdomain,
                     position: found?.position || null,
                     page: found?.page || null,
                     title: found?.title || null,
@@ -94,7 +94,7 @@ export const rankTracker = async (keyword, targetdomain) => {
         }
     } catch (error) {
         console.log(error)
-        if (browser) await browser.close().catch((err) > { success: false, message: err.message })
+        if (browser) await browser.close().catch((error) > { success: false, message: error.message })
         return { success: false, message: error.message || "Failed to resolve rank tracker" }
     }
 }

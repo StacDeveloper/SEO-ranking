@@ -45,7 +45,6 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
     async function login(email: string, password: string) {
         try {
             const response = await axios.post(`${BACKEND_URL}/api/auth/login`, { email, password })
-            console.log(response)
             if (response.data.success) {
                 SetToken(response.data.token)
                 SetUser(response.data.user)
@@ -80,7 +79,8 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
     }
 
     async function loadUser() {
-        if (!token) {
+        const storedToken = localStorage.getItem("token")
+        if (!storedToken) {
             SetLoading(false)
             return
         }
@@ -88,18 +88,23 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
             const { data } = await api.get("/api/auth/user")
             if (data.success) {
                 SetUser(data.user)
+                SetLoading(false)
             }
         } catch (error) {
             console.log(error)
             localStorage.removeItem("token")
             SetToken(null)
+            SetLoading(false)
             SetUser(null)
+        }finally{
+            SetLoading(false)
         }
+        
     }
 
     useEffect(() => {
         loadUser()
-    }, [user])
+    }, [])
 
     const value = {
         user,
@@ -108,7 +113,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
         api,
         login,
         register,
-        logout
+        logout,
     }
     return (<AppContext.Provider value={value}>
             {children}

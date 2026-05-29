@@ -15,7 +15,7 @@ await connectDB()
 
 app.use("/api/auth", authRouter)
 app.use("/api/rank", rankRoutes)
-app.use("/", (req, res) => {
+app.use("/health", (req, res) => {
     res.json({ success: true, message: "Server is healthy" })
 })
 app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`))
