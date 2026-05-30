@@ -20,7 +20,7 @@ export async function addKeyword(req, res) {
         // create tracking entry
         const tracking = await keyWord.create({
             userId: req.userId,
-            keyword: keyword.toLowerCase().trim(),
+            keyword: keyword.toLowerCase().trim().replace(/['"]/g, ""),
             url: url.startsWith("http") ? url : `https://${url}`,
             domain,
             status: "checking"

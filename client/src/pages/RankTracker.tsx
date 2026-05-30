@@ -89,22 +89,59 @@ export default function RankTracker() {
     };
 
     const handleRefresh = async (id: string) => {
-        setRefreshing(id);
-        setTimeout(() => {
-            setRefreshing(null);
-        }, 1000);
+        setRefreshing(id)
+        try {
+            await api.post(`/api/rank/${id}/refresh`)
+            setKeywords((prev) => prev.map((key) => (key._id === id ? { ...key, status: "checking" } : key)))
+            const pollInterval = setInterval(async () => {
+                try {
+                    const check = await api.get(`/api/rank/${id}`)
+                    const tracking = check.data.tracking
+                    if (!tracking) return
+                    if (tracking.status !== "checking") {
+                        clearInterval(pollInterval)
+                        setKeywords((prev) => prev.map((key) => (key._id === id ? check.data.tracking : key)))
+                        setRefreshing(null)
+                    }
+                } catch (error) {
+                    clearInterval(pollInterval)
+                    setRefreshing(null)
+                }
+
+            }, 4000);
+        } catch (error: any) {
+            console.log(error)
+            setRefreshing(null)
+            toast.error(error?.response?.message || error.message || "Handle Refresh Error")
+        }
     };
 
     const handleDelete = async (id: string) => {
         if (!confirm("Delete this keyword tracking?")) return;
         setDeleting(id);
-        setTimeout(() => {
-            setDeleting(null);
-        }, 1000);
+        try {
+            await api.delete(`/api/rank/${id}/delete`)
+            setKeywords((prev) => prev.filter((key) => key._id !== id))
+            toast.success(`Tracking Deleted ${keywords.find((i) => i._id === id)?.domain}`)
+        } catch (error: any) {
+            console.log(error)
+            toast.error(error.message || error?.response?.message || "Handle Delete Error")
+        }
+        setDeleting(null)
     };
 
     const handleToggle = async (id: string) => {
-        console.log(id);
+        try {
+            const res = await api.put(`/api/rank/${id}/toggle`)
+            if (res.data.success) {
+                setKeywords((prev) => prev.map((key) => (key._id === id ? { ...key, active: res.data.tracking.active } : key)))
+                toast.success(`Tracking's been ${res.data.tracking.active === false ? "inactive" : "active"} for ${keywords.find((key) => key._id === id)?.domain}`)
+            }
+
+        } catch (error: any) {
+            console.log(error)
+            toast.error(error.message || error?.response?.message || "Handle Toggle Error")
+        }
     };
 
     const getPositionBadge = (pos: number | null) => {

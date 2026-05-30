@@ -29,7 +29,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
     const [user, SetUser] = useState<User | null>(null)
     const [token, SetToken] = useState<string | null>(localStorage.getItem("token"))
     const [loading, SetLoading] = useState<boolean>(true)
-
+    
 
     const api = axios.create({
         baseURL: BACKEND_URL
@@ -96,10 +96,10 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
             SetToken(null)
             SetLoading(false)
             SetUser(null)
-        }finally{
+        } finally {
             SetLoading(false)
         }
-        
+
     }
 
     useEffect(() => {
@@ -116,13 +116,13 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
         logout,
     }
     return (<AppContext.Provider value={value}>
-            {children}
-        </AppContext.Provider>)
-    
+        {children}
+    </AppContext.Provider>)
+
 }
 
 export function useAppContext() {
     const context = useContext(AppContext)
-    if(!context) throw new Error("Context need to be inside AppContext Provider")
+    if (!context) throw new Error("Context need to be inside AppContext Provider")
     return context
 }
