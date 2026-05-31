@@ -1,4 +1,5 @@
 import { analysis } from "../models/analysis.js";
+import { scrapURL } from "../service/scraperService.js";
 
 export async function analyseUrl(req, res) {
     try {
@@ -12,7 +13,23 @@ export async function analyseUrl(req, res) {
             validURL = new URL(url.startsWith("http") ? url : `https://${url}`)
             const analysis = await analysis.create({ userId: req.userId, url: validURL.href, status: "processing" })
             res.json({ success: true, message: "Analysis started", analysis: analysis._id })
-            
+
+            // run scrapping and analysis in background
+            try {
+                const scrapResult = await scrapURL(validURL.href)
+                if (!scrapResult.success) {
+                    analysis.status = "failed"
+                    await analysis.save()
+                    return
+                }
+                // analyse with gemini AI
+                
+            } catch (scrapError) {
+                console.error("Analyse URL error" + scrapError)
+                if (!res.headersSent) {
+                    res.status(500).json({ success: false, message: "Server error" })
+                }
+            }
 
         } catch (error) {
             return res.status(400).json({ success: false, message: error.message || "Invalid URL format" })
