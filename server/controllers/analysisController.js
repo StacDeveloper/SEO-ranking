@@ -1,4 +1,4 @@
-import { analysis } from "../models/analysis.js";
+import { Analysis } from "../models/analysis.js";
 import { scrapURL } from "../service/scraperService.js";
 
 export async function analyseUrl(req, res) {
@@ -11,7 +11,7 @@ export async function analyseUrl(req, res) {
         let validURL;
         try {
             validURL = new URL(url.startsWith("http") ? url : `https://${url}`)
-            const analysis = await analysis.create({ userId: req.userId, url: validURL.href, status: "processing" })
+            const analysis = await Analysis.create({ userId: req.userId, url: validURL.href, status: "processing" })
             res.json({ success: true, message: "Analysis started", analysis: analysis._id })
 
             // run scrapping and analysis in background
@@ -23,7 +23,7 @@ export async function analyseUrl(req, res) {
                     return
                 }
                 // analyse with gemini AI
-                
+
             } catch (scrapError) {
                 console.error("Analyse URL error" + scrapError)
                 if (!res.headersSent) {

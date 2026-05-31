@@ -22,7 +22,7 @@ const analysisSchema = new mongoose.Schema({
     metadata: {
         title: { type: String, default: "" },
         description: { type: String, default: "" },
-        cannonical: { type: Sstring, default: "" },
+        cannonical: { type: String, default: "" },
         robots: { type: String, default: "" },
         ogTitle: { type: String, default: "" },
         ogDescription: { type: String, default: "" },
@@ -47,7 +47,7 @@ const analysisSchema = new mongoose.Schema({
     },
     images: {
         total: { type: Number, default: 0 },
-        missingAlt: { type: String, default: 0 },
+        missingAlt: { type: Number, default: 0 },
         withAlt: { type: Number, default: 0 }
     },
     keywords: [{ word: String, count: Number, density: Number }],
@@ -59,5 +59,5 @@ const analysisSchema = new mongoose.Schema({
 
 }, { timestamps: true })
 
-export const analysis = mongoose.model("analysis", analysisSchema)
+export const Analysis = mongoose.model("Analysis", analysisSchema)
 
